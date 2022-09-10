@@ -1,16 +1,35 @@
-from get_data import get_cords
 from pan_to_gps import get_camera_direction, GpsLocation
+from gps3 import gps3
 import pantilthat
 import time
 
-target = GpsLocation(25.907620255792594, -80.13785843477541, 5)
-camera_center = 0
+target = GpsLocation(25.907620255792594, -80.13785843477541, 0)
+camera_center = 35
 
-direction = get_camera_direction(get_cords(), target, camera_center)
+gps_socket = gps3.GPSDSocket()
+data_stream = gps3.DataStream()
+gps_socket.connect()
+gps_socket.watch()
 
-pantilthat.pan(direction.rotation)
-pantilthat.tilt(direction.elevation)
-time.sleep(1)
+print('waiting for data')
+for new_data in gps_socket:
+    if new_data:
+        data_stream.unpack(new_data)
+        camera_location = GpsLocation(data_stream.TPV['lat'], data_stream.TPV['lon'], data_stream.TPV['alt'])
+        print(camera_location)
+
+        try:
+            direction = get_camera_direction(camera_location, target, camera_center)
+
+            print(direction)
+
+            pantilthat.pan(direction.rotation)
+            pantilthat.tilt(direction.elevation)
+        except:
+            print("Invalid coordinates")
+
+
+
 
 
 

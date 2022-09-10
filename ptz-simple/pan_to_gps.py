@@ -11,11 +11,17 @@ class GpsLocation:
         self.longitude = longitude
         self.altitude = altitude
 
+    def __str__(self):
+        return 'Altitude = ' + str(self.altitude) + ', Latitude = ' + str(self.latitude) + ', Longitude = ' + str(self.longitude)
+
 
 class Direction:
     def __init__(self, rotation, elevation):
         self.rotation = rotation
         self.elevation = elevation
+
+    def __str__(self):
+        return 'Rotation = ' + str(self.rotation) + ', Elevation = ' + str(self.elevation)
 
 
 def get_direction(source: GpsLocation, target: GpsLocation) -> Direction:
@@ -40,8 +46,6 @@ def get_direction(source: GpsLocation, target: GpsLocation) -> Direction:
 
     d = R * c
 
-    print(d)
-
     altitude_difference = target.altitude - source.altitude
     elevation = math.atan(altitude_difference / d)
 
@@ -56,7 +60,3 @@ def get_camera_direction(camera: GpsLocation, target_object: GpsLocation, camera
 
     return Direction(min(max(camera_rotation_angle, -90), 90), min(max(camera_elevation_angle, -90), 90))
 
-
-# pantilthat.pan(min(max(camera_rotation_angle, -90), 90))
-# pantilthat.tilt(min(max(camera_elevation_angle, -90), 90))
-# time.sleep(1)
