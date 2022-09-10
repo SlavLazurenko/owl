@@ -30,14 +30,18 @@ def get_camera_direction(camera: GpsLocation, target: GpsLocation) -> CameraDire
     return CameraDirection(math.degrees(rotation) % 380, elevation)
 
 
-camera = GpsLocation(25.90737600409141, -80.13863066765238, 0)
-target = GpsLocation(25.907252293090163, -80.13852248577308, 0)
+camera = GpsLocation(25.90735990503165, -80.13862756341351, 0)
+target = GpsLocation(25.907166827337466, -80.13907274279559, 0)
 
 directions = get_camera_direction(camera, target)
 
 camera_center = 180
 
-camera_rotation_angle = directions.rotation - camera_center
+camera_rotation_angle = (directions.rotation - camera_center) * -1
 
-pantilthat.pan(camera_rotation_angle)
+print(camera_rotation_angle)
+
+
+pantilthat.pan(min(max(camera_rotation_angle, -90), 90))
+# pantilthat.pan(90)
 time.sleep(1)
