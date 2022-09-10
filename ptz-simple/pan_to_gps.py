@@ -49,14 +49,20 @@ def get_direction(source: GpsLocation, target: GpsLocation) -> Direction:
     altitude_difference = target.altitude - source.altitude
     elevation = math.atan(altitude_difference / d)
 
-    return Direction(math.degrees(rotation) % 360, math.degrees(elevation))
+    direction = Direction(math.degrees(rotation) % 360, math.degrees(elevation))
+    print(direction)
+    return direction
 
 
 def get_camera_direction(camera: GpsLocation, target_object: GpsLocation, camera_center: int = 0):
     directions = get_direction(camera, target_object)
 
-    camera_rotation_angle = (directions.rotation - camera_center) * -1
-    camera_elevation_angle = directions.elevation
+    camera_rotation_angle = directions.rotation
+    if camera_rotation_angle >= 180:
+        camera_rotation_angle = camera_rotation_angle - 360
+
+    camera_rotation_angle = (camera_rotation_angle - camera_center) * -1
+    camera_elevation_angle = (directions.elevation -23)* -1
 
     return Direction(min(max(camera_rotation_angle, -90), 90), min(max(camera_elevation_angle, -90), 90))
 
