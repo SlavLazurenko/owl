@@ -1,4 +1,5 @@
 import json
+import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Lock
 from threading import Thread
@@ -25,9 +26,9 @@ class MyServer(BaseHTTPRequestHandler):
         try:
             j = json.loads(post_data.decode('utf-8'))
             with lock:
-                target_location.latitude = j['latitude']
-                target_location.longitude = j['longitude']
-                target_location.altitude = j['altitude']
+                target_location.latitude = j['lat']
+                target_location.longitude = j['lng']
+                target_location.altitude = j['alt']
 
             print("Request ", target_location)
             self.send_response(200)
@@ -38,6 +39,13 @@ class MyServer(BaseHTTPRequestHandler):
 
         self.end_headers()
 
+
+def test_task(lock, target_location: GpsLocation):
+    print('waiting for data')
+    while True:
+        with lock:
+            print(target_location)
+        time.sleep(1)
 
 # work function
 def task(lock, target_location: GpsLocation):
@@ -50,10 +58,6 @@ def task(lock, target_location: GpsLocation):
     gps_socket.watch()
 
     print('waiting for data')
-    # while True:
-    #     with lock:
-    #         print(target_location)
-    #     time.sleep(1)
 
     for new_data in gps_socket:
         if new_data:
@@ -79,7 +83,7 @@ if __name__ == "__main__":
 
     lock = Lock()
 
-    Thread(target=task, args=(lock, target_location)).start()
+    Thread(target=test, args=(lock, target_location)).start()
 
     try:
         webServer.serve_forever()
