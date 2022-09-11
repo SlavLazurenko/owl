@@ -5,14 +5,14 @@ from threading import Lock
 from threading import Thread
 from gps3 import gps3
 import pantilthat
+import os
 
 from pan_to_gps import GpsLocation, get_camera_direction
 
-hostName = "0.0.0.0"
-serverPort = 8080
+hostName = os.environ.get('HOST', 'localhost')
+serverPort = os.environ.get('PORT', '8080')
 
 target_location = GpsLocation(0, 0, 0)
-
 
 class MyServer(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
@@ -64,7 +64,7 @@ def test_task(lock, target_location: GpsLocation):
 # work function
 def task(lock, target_location: GpsLocation):
     # acquire the lock
-    camera_center = 65
+    camera_center = float(os.environ.get('CAMERA_DIRECTION_DEGREES', '0'))
 
     gps_socket = gps3.GPSDSocket()
     data_stream = gps3.DataStream()
