@@ -8,13 +8,25 @@ import pantilthat
 
 from pan_to_gps import GpsLocation, get_camera_direction
 
-hostName = "localhost"
+hostName = "0.0.0.0"
 serverPort = 8080
 
 target_location = GpsLocation(0, 0, 0)
 
 
 class MyServer(BaseHTTPRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.end_headers()
+
+    def end_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        return super(MyServer, self).end_headers()
+
     def do_POST(self):
         global target_location
         global lock
@@ -32,9 +44,11 @@ class MyServer(BaseHTTPRequestHandler):
 
             print("Request ", target_location)
             self.send_response(200)
+            # self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Content-type', 'text/html')
         except:
             self.send_response(500)
+            # self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Content-type', 'text/html')
 
         self.end_headers()
@@ -50,7 +64,7 @@ def test_task(lock, target_location: GpsLocation):
 # work function
 def task(lock, target_location: GpsLocation):
     # acquire the lock
-    camera_center = 35
+    camera_center = 65
 
     gps_socket = gps3.GPSDSocket()
     data_stream = gps3.DataStream()
@@ -83,7 +97,7 @@ if __name__ == "__main__":
 
     lock = Lock()
 
-    Thread(target=test, args=(lock, target_location)).start()
+    Thread(target=task, args=(lock, target_location)).start()
 
     try:
         webServer.serve_forever()
